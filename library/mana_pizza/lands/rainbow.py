@@ -10,7 +10,7 @@ class RainbowLands:
     _city_of_brass = None
 
     @classmethod
-    def _get(cls, attr):
+    def _get(cls, attr) -> Land:
         if not cls._loaded:
             cls._load()
         return getattr(cls, attr)
@@ -28,17 +28,17 @@ class RainbowLands:
         cls._loaded = True
 
     @classmethod
-    def command_tower(cls):
+    def command_tower(cls) -> Land:
         return cls._get("_command_tower")
 
     @classmethod
-    def exotic_orchard(cls):
+    def exotic_orchard(cls) -> Land:
         return cls._get("_exotic_orchard")
 
     @classmethod
-    def mana_confluence(cls):
+    def mana_confluence(cls) -> Land:
         return cls._get("_mana_confluence")
 
     @classmethod
-    def city_of_brass(cls):
+    def city_of_brass(cls) -> Land:
         return cls._get("_city_of_brass")

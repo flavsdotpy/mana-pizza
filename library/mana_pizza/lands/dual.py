@@ -46,14 +46,14 @@ class BoundLands(metaclass=LandSetMetaclass):
 
 class CheckLands(metaclass=LandSetMetaclass):
     lands = {
-        "Clifftop Retreat": ColorCombinations.IZZET,
+        "Clifftop Retreat": ColorCombinations.BOROS,
         "Dragonskull Summit": ColorCombinations.RAKDOS,
         "Drowned Catacomb": ColorCombinations.DIMIR,
         "Glacial Fortress": ColorCombinations.AZORIUS,
         "Hinterland Harbor": ColorCombinations.SIMIC,
         "Isolated Chapel": ColorCombinations.ORZHOV,
         "Rootbound Crag": ColorCombinations.GRUUL,
-        "Sulfur Falls": ColorCombinations.BOROS,
+        "Sulfur Falls": ColorCombinations.IZZET,
         "Sunpetal Grove": ColorCombinations.SELESNYA,
         "Woodland Cemetery": ColorCombinations.GOLGARI,
     }
@@ -130,7 +130,7 @@ class GuildGates(metaclass=LandSetMetaclass):
     tags = {LandTags.GATE}
 
 
-class HorizonLands:
+class HorizonLands(metaclass=LandSetMetaclass):
     lands = {
         "Horizon Canopy": ColorCombinations.SELESNYA,
         "Silent Clearing": ColorCombinations.ORZHOV,
@@ -143,7 +143,6 @@ class HorizonLands:
 
 
 class OGDuals(metaclass=LandSetMetaclass):
-    specific_edition = Editions.THIRD_EDITION
     lands = {
         "Bayou": ColorCombinations.GOLGARI,
         "Badlands": ColorCombinations.RAKDOS,
@@ -223,7 +222,7 @@ class SlowLands(metaclass=LandSetMetaclass):
     tags = {LandTags.ENTERS_UNTAPPED}
 
 
-class FastLands:
+class FastLands(metaclass=LandSetMetaclass):
     lands = {
         "Seachrome Coast": ColorCombinations.AZORIUS,
         "Darkslick Shores": ColorCombinations.DIMIR,
@@ -325,7 +324,7 @@ class Bridges(metaclass=LandSetMetaclass):
     tags = {LandTags.ARTIFACT}
 
 
-class ManLands:
+class ManLands(metaclass=LandSetMetaclass):
     lands = {
         "Celestial Colonnade": ColorCombinations.AZORIUS,
         "Creeping Tar Pit": ColorCombinations.DIMIR,
@@ -338,6 +337,7 @@ class ManLands:
         "Needle Spires": ColorCombinations.BOROS,
         "Lumbering Falls": ColorCombinations.SIMIC,
     }
+    tags = {LandTags.BECOMES_CREATURE}
 
 
 class RestlessManLands(metaclass=LandSetMetaclass):
@@ -356,7 +356,7 @@ class RestlessManLands(metaclass=LandSetMetaclass):
     tags = {LandTags.BECOMES_CREATURE}
 
 
-class RevealLands:
+class RevealLands(metaclass=LandSetMetaclass):
     lands = {
         "Port Town": ColorCombinations.AZORIUS,
         "Choked Estuary": ColorCombinations.DIMIR,
@@ -372,7 +372,7 @@ class RevealLands:
     tags = {LandTags.ENTERS_UNTAPPED}
 
 
-class Campuses:
+class Campuses(metaclass=LandSetMetaclass):
     lands = {
         "Silverquill Campus": ColorCombinations.ORZHOV,
         "Prismari Campus": ColorCombinations.IZZET,
@@ -383,7 +383,7 @@ class Campuses:
     tags = {LandTags.MANA_SINK}
 
 
-class CapennaLocales:
+class CapennaLocales(metaclass=LandSetMetaclass):
     lands = {
         "Botanical Plaza": ColorCombinations.SELESNYA,
         "Racers' Ring": ColorCombinations.GRUUL,
@@ -394,7 +394,7 @@ class CapennaLocales:
     tags = {LandTags.MANA_SINK}
 
 
-class OldPureTapLands:
+class OldPureTapLands(metaclass=LandSetMetaclass):
     lands = {
         "Coastal Tower": ColorCombinations.AZORIUS,
         "Salt Marsh": ColorCombinations.DIMIR,
@@ -405,7 +405,7 @@ class OldPureTapLands:
     tags = {}
 
 
-class PureTapLands:
+class PureTapLands(metaclass=LandSetMetaclass):
     lands = {
         "Meandering River": ColorCombinations.AZORIUS,
         "Submerged Boneyard": ColorCombinations.DIMIR,

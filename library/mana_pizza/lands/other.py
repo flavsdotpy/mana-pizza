@@ -7,7 +7,7 @@ class ColorlessUtilityLands:
     _reliquary_tower = None
     _rogues_passage = None
 
-    def _get(cls, attr):
+    def _get(cls, attr) -> Land:
         if not cls._loaded:
             cls._load()
         return getattr(cls, attr)
@@ -20,10 +20,10 @@ class ColorlessUtilityLands:
         cls._loaded = True
 
     @classmethod
-    def reliquary_tower(cls):
+    def reliquary_tower(cls) -> Land:
         return cls._get("_reliquary_tower")
 
     @classmethod
-    def rogues_passage(cls):
+    def rogues_passage(cls) -> Land:
         return cls._get("_rogues_passage")
 

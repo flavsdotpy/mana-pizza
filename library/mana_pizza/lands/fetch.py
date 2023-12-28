@@ -34,7 +34,6 @@ class OtherFechLands(metaclass=LandSetMetaclass):
 
 
 PICK_PRIORITY = {
-    0: ColoredFetchLands,
     1: OtherFechLands,
     10: BasicFetchLands
 }

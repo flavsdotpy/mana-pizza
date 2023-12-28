@@ -1,3 +1,7 @@
+import json
+import os
+from collections import defaultdict
+from math import inf
 from time import sleep
 
 import requests
@@ -23,12 +27,13 @@ class ScryfallClient:
         return res.json()
 
     def __encode_q_param(self, value):
-        return urllib.parse.quote(value, safe='"!, /\: ')
+        return urllib.parse.quote(value, safe='"!, /\: \'')
 
-    def list_symbology(self):
+    def fetch_symbology(self):
         return self.__request_scryfall_api(ScryfallEndpoints.LIST_SYMBOLOGY)["data"]
 
-    def get_card_by_name(self, card_name, edition=None):
+    def fetch_card_by_name(self, card_name, edition=None):
+        print(f"Fetching card {card_name} from scryfall...")
         query = f"!\"{card_name}\""
         if edition:
             query += f" set:{edition}"
@@ -39,6 +44,19 @@ class ScryfallClient:
             print("Duplicated cards found!")
             return None
         return res["data"][0]
+    
+
+class CardsDB:
+
+    __DB_FILE = "db.json"
+
+    def __init__(self):
+        with open(self.__DB_FILE) as db_content:
+            self.db = json.load(db_content)
+
+    def get_card_by_name(self, card_name):
+        return self.db[card_name]
 
 
 scryfall_client = ScryfallClient()
+cards_db = CardsDB()

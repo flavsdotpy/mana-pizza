@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "mana-pizza"
+version = "0.1.0"
+description = "Mana-smoothing algorythm library meant for 2+ colors EDH decks."
+authors = ["Flavio Teixeira <flavio.mtps@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

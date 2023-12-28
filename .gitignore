@@ -1,5 +1,6 @@
-# Custom
+# Project
 test
+*db*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -130,6 +131,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.python-version
 
 # Spyder project settings
 .spyderproject

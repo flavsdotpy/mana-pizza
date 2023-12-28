@@ -11,7 +11,7 @@ class BasicLands:
     _mountain = None
 
     @classmethod
-    def _get(cls, attr):
+    def _get(cls, attr)  -> Land:
         if not cls._loaded:
             cls._load()
         return getattr(cls, attr)
@@ -31,7 +31,7 @@ class BasicLands:
         cls._loaded = True
 
     @classmethod
-    def get_by_color(cls, color):
+    def get_by_color(cls, color) -> Land:
         return {
             ManaColors.WHITE: cls.plains,
             ManaColors.BLUE: cls.island,
@@ -41,22 +41,22 @@ class BasicLands:
         }[color]()
 
     @classmethod
-    def forest(cls):
+    def forest(cls) -> Land:
         return cls._get("_forest")
 
     @classmethod
-    def plains(cls):
+    def plains(cls) -> Land:
         return cls._get("_plains")
 
     @classmethod
-    def swamp(cls):
+    def swamp(cls) -> Land:
         return cls._get("_swamp")
 
     @classmethod
-    def island(cls):
+    def island(cls) -> Land:
         return cls._get("_island")
 
     @classmethod
-    def mountain(cls):
+    def mountain(cls) -> Land:
         return cls._get("_mountain")
 
