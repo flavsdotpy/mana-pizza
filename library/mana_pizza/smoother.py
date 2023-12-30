@@ -1,8 +1,10 @@
 from collections import Counter
 from math import ceil, inf
 
+from mana_pizza.commons.db import local_db
+from mana_pizza.commons.log import get_logger
 from mana_pizza.commons.mtg import Land, ManaColors
-from mana_pizza.commons.scryfall import scryfall_client, cards_db
+from mana_pizza.commons.scryfall import scryfall_client
 from mana_pizza.lands.basic import BasicLands
 from mana_pizza.lands.dual import PICK_PRIORITY as DUAL_PICK_PRIORITY
 from mana_pizza.lands.fetch import PICK_PRIORITY as FETCH_PICK_PRIORITY, ColoredFetchLands
@@ -38,13 +40,15 @@ class ManaSmootherHelper:
     @classmethod
     def load(cls):
         if not cls.__loaded:
+            get_logger().info("Loading smoother resources...")
+            local_db.load()
             cls.__load_lands()
             cls.__load_mana_symbols()
             cls.__loaded = True
 
     @classmethod
     def __load_lands(self):
-        print("Setting up land base...")
+        get_logger().info("Setting up land base...")
         BasicLands.plains()
         RainbowLands.command_tower()
         for fetch_cls in FETCH_PICK_PRIORITY.values():
@@ -56,7 +60,7 @@ class ManaSmootherHelper:
 
     @classmethod
     def __load_mana_symbols(self):
-        print("Setting up mana symbols...")
+        get_logger().info("Setting up mana symbols...")
         self.__mana_symbols = {
             ManaColors.WHITE: [],
             ManaColors.RED: [],
@@ -78,25 +82,27 @@ class ManaSmootherHelper:
 
     @classmethod
     def mana_symbols(cls) -> dict:
-        cls.load()
         return cls.__mana_symbols
 
 
 class ManaPizzaLandSmoother:
 
     def __init__(self, commander: str, parameters: dict = {}):
+        self.errors = list()
         self.commander = commander
         self.card_price_limit = parameters.get("card_price_limit", inf)
         self.__load_commander_info()
 
     def __load_commander_info(self):
-        print(f"Loading info. Commander: {self.commander}")
-        card = cards_db.get_card_by_name(self.commander)
-        self.deck_color_identity = set(card["color_identity"])
-
+        get_logger().debug(f"Loading info. Commander: {self.commander}")
+        try:
+            card = local_db.get_card_by_name(self.commander)
+            self.deck_color_identity = set(card["color_identity"])
+        except:
+            self.errors.append("Commander not found!")
 
     def __get_pip_count_for_card(self, card_obj: dict):
-        print(f"Calculating mana statistics for: {card_obj['name']}")
+        get_logger().debug(f"Calculating mana statistics for: {card_obj['name']}")
         card_pip_count = {
             ManaColors.WHITE: 0,
             ManaColors.RED: 0,
@@ -111,11 +117,15 @@ class ManaPizzaLandSmoother:
         return card_pip_count
 
     def __calc_mana_stats(self):
-        print("Calculating cards list mana statistics...")
+        get_logger().debug("Calculating cards list mana statistics...")
         self.pip_count = {}
         self.total_cmc = 0
         for card_name in self.card_list:
-            card_obj = cards_db.get_card_by_name(card_name)
+            try:
+                card_obj = local_db.get_card_by_name(card_name)
+            except:
+                self.errors.append(f"Card {card_name} not found!")
+                continue
             self.total_cmc += card_obj["cmc"]
             card_pips = self.__get_pip_count_for_card(card_obj)
             self.pip_count = {
@@ -125,16 +135,16 @@ class ManaPizzaLandSmoother:
         self.total_pips = sum(self.pip_count.values())
         self.color_proportions = dict(sorted(
             {
-                color: color_pips / self.total_pips
+                color: round(color_pips / self.total_pips, 2)
                 for color, color_pips in self.pip_count.items()
             }.items(), key=lambda item: item[1], reverse=True
         ))
-        print(f"Total CMC: {self.total_cmc}")
-        print(f"CMC average with lands: {self.total_cmc/100}")
-        print(f"CMC average w/o lands: {self.total_cmc/len(self.card_list)}")
-        print(f"Pip count:")
+        get_logger().debug(f"Total CMC: {self.total_cmc}")
+        get_logger().debug(f"CMC average with lands: {self.total_cmc/100}")
+        get_logger().debug(f"CMC average w/o lands: {self.total_cmc/len(self.card_list)}")
+        get_logger().debug(f"Pip count:")
         for c, count in self.pip_count.items():
-            print(f"{c}: {count}")
+            get_logger().debug(f"{c}: {count}")
 
     def __select_land(self, land: Land):
         if not land:
@@ -142,11 +152,11 @@ class ManaPizzaLandSmoother:
         if land.price > self.card_price_limit:
             return False
         self.selected_lands.append(land)
-        print(f"Selected {land.name}")
+        get_logger().debug(f"Selected {land.name}")
         return True
 
     def __get_basic_lands(self):
-        print("Selecting basic lands...")
+        get_logger().debug("Selecting basic lands...")
         before = len(self.selected_lands)
         total_pips = sum(self.pip_count.values())
         for color in self.deck_color_identity:
@@ -156,7 +166,7 @@ class ManaPizzaLandSmoother:
                 basic_land = BasicLands.get_by_color(color)
                 for _ in range(int(round(color_land_count))):
                     self.__select_land(basic_land)
-        print(f"Selected {len(self.selected_lands) - before} basic lands!")
+        get_logger().debug(f"Selected {len(self.selected_lands) - before} basic lands!")
 
     def __calc_dual_land_pairs(
         self, color_proportions: dict, num_lands: int, pairs: list[set] = None, has_major_color: bool = False
@@ -190,14 +200,14 @@ class ManaPizzaLandSmoother:
 
         if not color_proportions:
             return pairs
-        
+
         if not has_major_color and cur_color_proportion >= .5:
             has_major_color = True
 
         return self.__calc_dual_land_pairs(color_proportions, num_lands, pairs, has_major_color)
 
     def __get_dual_lands(self):
-        print("Selecting dual lands...")
+        get_logger().debug("Selecting dual lands...")
         before = len(self.selected_lands)
         num_dual_lands = self.lands_count - len(self.selected_lands)
         color_proportions = self.color_proportions.copy()
@@ -212,11 +222,11 @@ class ManaPizzaLandSmoother:
                     pairs_count[color_pair] -= 1
             if not sum(pairs_count.values()):
                 break
-        print(f"Selected {len(self.selected_lands) - before} dual lands!")
+        get_logger().debug(f"Selected {len(self.selected_lands) - before} dual lands!")
 
 
     def __get_tri_lands(self):
-        print("Selecting tri lands...")
+        get_logger().debug("Selecting tri lands...")
         before = len(self.selected_lands)
         slots = ManaSmootherConf.TRI_LAND_SLOTS[len(self.deck_color_identity)]
         if len(self.deck_color_identity) < 3:
@@ -242,10 +252,10 @@ class ManaPizzaLandSmoother:
                 land = tri_land_class.get_for_combination(color_trio)
                 if self.__select_land(land):
                     slots -= 1
-        print(f"Selected {len(self.selected_lands) - before} tri lands!")
+        get_logger().debug(f"Selected {len(self.selected_lands) - before} tri lands!")
 
     def __get_fetch_lands(self):
-        print("Selecting fetch lands...")
+        get_logger().debug("Selecting fetch lands...")
         before = len(self.selected_lands)
         slots = ManaSmootherConf.FETCH_LANDS_SLOTS[len(self.deck_color_identity)]
         if len(self.deck_color_identity) == 2:
@@ -270,10 +280,10 @@ class ManaPizzaLandSmoother:
                     break
                 if self.__select_land(land):
                     slots -= 1
-        print(f"Selected {len(self.selected_lands) - before} fetch lands!")
+        get_logger().debug(f"Selected {len(self.selected_lands) - before} fetch lands!")
 
     def __get_rainbow_lands(self):
-        print("Selecting rainbow lands...")
+        get_logger().debug("Selecting rainbow lands...")
         before = len(self.selected_lands)
         self.__select_land(RainbowLands.command_tower())
         if len(self.deck_color_identity) > 2:
@@ -282,17 +292,20 @@ class ManaPizzaLandSmoother:
             self.__select_land(RainbowLands.city_of_brass())
         if len(self.deck_color_identity) > 3:
             self.__select_land(RainbowLands.mana_confluence())
-        print(f"Selected {len(self.selected_lands) - before} rainbow lands!")
+        get_logger().debug(f"Selected {len(self.selected_lands) - before} rainbow lands!")
 
     def smooth_mana(self, card_list: list[str]):
-        self.card_list = card_list
+        self.card_list = [c for c in card_list if c]
         self.lands_count = 99 - len(card_list)
         self.selected_lands = list()
         self.__calc_mana_stats()
+
+        if self.errors:
+            return list()
+
         self.__get_basic_lands()
         self.__get_rainbow_lands()
         self.__get_fetch_lands()
         self.__get_tri_lands()
         self.__get_dual_lands()
-        for l in self.selected_lands:
-            print(l.name)
+        return self.selected_lands

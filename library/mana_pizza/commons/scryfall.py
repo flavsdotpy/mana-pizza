@@ -1,11 +1,9 @@
-import json
-import os
-from collections import defaultdict
-from math import inf
 from time import sleep
 
 import requests
 import urllib.parse
+
+from mana_pizza.commons.log import get_logger
 
 
 class ScryfallEndpoints:
@@ -21,8 +19,8 @@ class ScryfallClient:
         sleep(.1)
         res = requests.get(f"{self.__SCRYFALL_API_HOST}/{endpoint}", json=body or {}, params=params or {})
         if res.status_code > 299:
-            print(f"Something happened when requesting scryfall API: {res.content}")
-            print(f"Endpoint: {endpoint}. Status code: {res.status_code}")
+            get_logger().error(f"Something happened when requesting scryfall API: {res.content}")
+            get_logger().error(f"Endpoint: {endpoint}. Status code: {res.status_code}")
             return None
         return res.json()
 
@@ -33,7 +31,7 @@ class ScryfallClient:
         return self.__request_scryfall_api(ScryfallEndpoints.LIST_SYMBOLOGY)["data"]
 
     def fetch_card_by_name(self, card_name, edition=None):
-        print(f"Fetching card {card_name} from scryfall...")
+        get_logger().debug(f"Fetching card {card_name} from scryfall...")
         query = f"!\"{card_name}\""
         if edition:
             query += f" set:{edition}"
@@ -41,22 +39,9 @@ class ScryfallClient:
         if not res:
             return None
         if res["total_cards"] > 1:
-            print("Duplicated cards found!")
+            get_logger().error("Duplicated cards found!")
             return None
         return res["data"][0]
-    
-
-class CardsDB:
-
-    __DB_FILE = "db.json"
-
-    def __init__(self):
-        with open(self.__DB_FILE) as db_content:
-            self.db = json.load(db_content)
-
-    def get_card_by_name(self, card_name):
-        return self.db[card_name]
 
 
 scryfall_client = ScryfallClient()
-cards_db = CardsDB()

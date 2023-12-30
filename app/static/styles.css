@@ -1,0 +1,105 @@
+body {
+    background-color: skyblue;
+}
+
+textarea {
+    resize: none;
+}
+
+span {
+    font-weight: bold;
+}
+
+.hidden {
+    display: none
+}
+
+.h1 {
+    font-weight: bold;
+}
+
+.h4 {
+    font-weight: bold;
+}
+
+.text-wrap {
+    position: relative;
+}
+
+.clipboard.icon {
+    position: absolute;
+    top: 2.6em;
+    right: 1.5em;
+    margin-top: 4px;
+    margin-left: 4px;
+    width: 13px;
+    height: 15px;
+    border: solid 1px #333333;
+    border-top: none;
+    border-radius: 1px;
+    cursor: pointer;
+}
+.clipboard.icon:before {
+    top: -1px;
+    left: 2px;
+    width: 5px;
+    height: 1px;
+    border: solid 1px #333333;
+    border-radius: 1px;
+}
+.clipboard.icon:after {
+    width: 3px;
+    height: 1px;
+    background-color: #333333;
+    box-shadow: 8px 0 0 0 #333333;
+}
+.icon:before, .icon:after {
+content: '';
+position: absolute;
+display: block;
+}
+
+.showNewLine {
+    white-space: pre-line;
+}
+
+.custom-tooltip {
+    --bs-tooltip-bg: #faeab4;
+    --bs-tooltip-color: #383838;
+    --bs-tooltip-max-width: 400px;
+}
+
+.safe-width {
+    min-width: 750px;
+    width: 100%;
+}
+
+.btn-social {
+    width: 45px;
+    padding: .5rem;
+}
+
+.alt-bg {
+    background-color: #faeab4;
+    color: #383838
+}
+
+#body-container {
+    position: relative;
+    min-height: 100vh;
+}
+
+#content-wrapper {
+    padding-bottom: 50px;
+    margin-top: 50px;
+}
+
+#footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

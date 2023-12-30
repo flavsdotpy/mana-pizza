@@ -1,6 +1,6 @@
 from math import inf
 
-from mana_pizza.commons.scryfall import cards_db
+from mana_pizza.commons.db import local_db
 
 
 class ManaColors:
@@ -20,7 +20,7 @@ class Land:
         self._load_scryfall_info()
 
     def _load_scryfall_info(self):
-        card = cards_db.get_card_by_name(self.name)
+        card = local_db.get_card_by_name(self.name)
         self.price = card["price"] or inf
 
     def can_be_fetched(self) -> bool:
@@ -55,10 +55,10 @@ class Land:
 
     def __str__(self) -> str:
         return f"{self.name} | Colors: {''.join(self.colors)} | Tags: {','.join(self.tags)}"
-    
+
     def __eq__(self, other) -> bool:
         return self.name == other.name
-    
+
     def __hash__(self) -> int:
         return hash(self.name)
 
