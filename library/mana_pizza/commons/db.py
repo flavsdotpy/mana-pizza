@@ -19,14 +19,15 @@ class LocalDB:
     def load(self):
         if not self.__loaded:
             get_logger().info("Loading local db...")
-            self.__load_db_from_s3()
+            if not int(os.getenv("SKIP_S3_DOWNLOAD", "0")):
+                self.__load_db_from_s3()
             with open(os.getenv("DB_LOCAL_FILE_PATH")) as db_content:
                 self.__db = json.load(db_content)
             self.__loaded = True
 
-    def get_card_by_name(self, card_name, supress_error: bool = False):
+    def get_card_by_name(self, card_name: str, supress_error: bool = False):
         try:
-            return self.__db["cards"][card_name]
+            return self.__db["cards"][card_name.upper()]
         except KeyError:
             if supress_error:
                 return None

@@ -86,7 +86,7 @@ def parse_db():
 
             card_name = card.get("flavor_name", card["name"])
 
-            db_full[card_name][f'{card["set"]}#{card["collector_number"]}'] = {
+            db_full[card_name.upper()][f'{card["set"]}#{card["collector_number"]}'] = {
                 "price": float(card.get("prices", dict()).get("usd", inf) or inf),
                 "name": card_name,
                 "color_identity": card.get("color_identity"),

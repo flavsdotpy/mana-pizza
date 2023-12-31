@@ -1,5 +1,5 @@
 body {
-    background-color: skyblue;
+    background-color: #faeab4;
 }
 
 textarea {
@@ -74,6 +74,13 @@ display: block;
     width: 100%;
 }
 
+.card-info {
+    min-width: 750px;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .btn-social {
     width: 45px;
     padding: .5rem;
@@ -82,6 +89,11 @@ display: block;
 .alt-bg {
     background-color: #faeab4;
     color: #383838
+}
+
+.bg {
+    background-color: skyblue;
+    color: #141414;
 }
 
 #body-container {
