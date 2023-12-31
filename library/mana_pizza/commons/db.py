@@ -26,11 +26,14 @@ class LocalDB:
 
     def get_card_by_name(self, card_name, supress_error: bool = False):
         try:
-            return self.__db[card_name]
+            return self.__db["cards"][card_name]
         except KeyError:
             if supress_error:
                 return None
             raise Exception(f"Card {card_name} not found in the internal Database")
+        
+    def get_last_updated(self):
+        return self.__db["last_updated"]
 
 
 local_db = LocalDB()

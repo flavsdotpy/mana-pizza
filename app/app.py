@@ -4,7 +4,7 @@ from http import HTTPStatus
 from flask import Flask, jsonify, render_template, request
 from flask_wtf.csrf import CSRFProtect
 
-from mana_pizza.smoother import ManaPizzaLandSmoother, ManaSmootherHelper
+from mana_pizza.smoother import ManaPizzaLandSmoother, ManaSmootherHelper, local_db
 
 app = Flask(__name__)
 app.secret_key = os.getenv("CSRF_KEY").encode()
@@ -14,7 +14,7 @@ ManaSmootherHelper.load()
 # Route to serve the main HTML page
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", last_update=local_db.get_last_updated())
 
 
 @app.route("/calculate", methods=["POST"])

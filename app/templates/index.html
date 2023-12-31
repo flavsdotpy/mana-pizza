@@ -17,9 +17,6 @@
         <div class="navbar navbar-expand alt-bg p-1 safe-width">
             <span class="navbar-brand mb-0 h1 p-2">Mana Pizza</span>
             <div class="container-fluid justify-content-end">
-                <div class="text-end p-2">
-                    Last price update: 2023-12-29<!-- {{ last_update }} -->
-                </div>
                 <div>
                     <a class="btn btn-primary btn-floating btn-social" style="background-color: #0082ca" target="_blank" href="https://www.linkedin.com/in/fm-teixeira/" role="button"><i class="fab fa-linkedin-in"></i></a>
                     <a class="btn btn-primary btn-floating btn-social" style="background-color: #333333" target="_blank" href="https://github.com/ap3xx" role="button"><i class="fab fa-github"></i></a>
@@ -41,10 +38,12 @@
                             <label for="inputPriceLimit" class="form-label h4">
                                 Land price limit
                                 <i class="fa-solid fa-circle-info justify-content-end"
-                                data-bs-toggle="tooltip"
-                                data-bs-custom-class="custom-tooltip"
-                                data-bs-placement="top"
-                                title="Prices based on Scryfall, updated daily."></i>
+                                    data-bs-toggle="tooltip"
+                                    data-bs-html="true"
+                                    data-bs-custom-class="custom-tooltip"
+                                    data-bs-placement="top"
+                                    title="Prices based on Scryfall, updated daily. <br/>
+                                           Last price update: {{ last_update }}"></i>
                             </label>
 
                             <div class="input-group mb-3">
