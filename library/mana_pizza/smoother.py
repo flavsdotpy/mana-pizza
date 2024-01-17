@@ -26,7 +26,7 @@ class ManaSmootherConf:
         5: 3
     }
     BASIC_LANDS_SLOTS = {
-        2: 18,
+        2: 20,
         3: 13,
         4: 8,
         5: 8
@@ -176,6 +176,10 @@ class ManaPizzaLandSmoother:
         num_colors = 2 * num_lands
         color_proportions = dict(sorted(color_proportions.items(), key=lambda item: item[1], reverse=True))
         sum_proportions = sum(color_proportions.values())
+
+
+        if len(self.deck_color_identity) == 2:
+            return [tuple(self.deck_color_identity) for _ in range(num_lands)]
 
         cur_color = list(color_proportions.keys())[0]
         cur_color_proportion = color_proportions.pop(cur_color)
