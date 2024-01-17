@@ -227,10 +227,12 @@ class ManaPizzaLandSmoother:
 
     def __get_tri_lands(self):
         get_logger().debug("Selecting tri lands...")
+        if len(self.deck_color_identity) < 3:
+            get_logger().debug("Skipping tri lands for decks with 2 or less colors...")
+            return
+
         before = len(self.selected_lands)
         slots = ManaSmootherConf.TRI_LAND_SLOTS[len(self.deck_color_identity)]
-        if len(self.deck_color_identity) < 3:
-            return
         if len(self.deck_color_identity) == 3:
             trio_color_combinations = [self.deck_color_identity]
         elif len(self.deck_color_identity) == 4:
@@ -295,6 +297,9 @@ class ManaPizzaLandSmoother:
         get_logger().debug(f"Selected {len(self.selected_lands) - before} rainbow lands!")
 
     def smooth_mana(self, card_list: list[str]):
+        if len(self.deck_color_identity) < 2:
+            self.errors.append("Mana pizza does not work for mono-color decks!")
+
         self.card_list = [c for c in card_list if c]
         self.lands_count = 99 - len(card_list)
         self.selected_lands = list()
