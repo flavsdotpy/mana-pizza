@@ -177,9 +177,10 @@ class ManaPizzaLandSmoother:
         color_proportions = dict(sorted(color_proportions.items(), key=lambda item: item[1], reverse=True))
         sum_proportions = sum(color_proportions.values())
 
-
         if len(self.deck_color_identity) == 2:
             return [tuple(self.deck_color_identity) for _ in range(num_lands)]
+        if not(sum_proportions):
+            return pairs
 
         cur_color = list(color_proportions.keys())[0]
         cur_color_proportion = color_proportions.pop(cur_color)
