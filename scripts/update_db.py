@@ -54,12 +54,20 @@ def get_file_link():
     
 
 def upload_file_to_s3():
-    s3_client = boto3.client("s3")
+    s3_client = boto3.client(
+        "s3",
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_KEY")
+    )
     s3_client.upload_file(TMP_LOCAL_FILE_PATH, S3_BUCKET, S3_KEY)
 
 
 def backup_old_file():
-    s3_client = boto3.client("s3")
+    s3_client = boto3.client(
+        "s3",
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_KEY")
+    )
     s3_client.copy_object(
         Bucket=S3_BUCKET, CopySource=f"{S3_BUCKET}/{S3_KEY}", Key=f"{S3_KEY}.old"
     )
