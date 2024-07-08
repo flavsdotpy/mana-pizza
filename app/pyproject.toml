@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mana-pizza-webapp"
-version = "1.0.0"
+version = "1.1.0"
 description = "Web Application for EDH mana smoothing."
 authors = ["Flávio Teixeira <flavio.mtps@gmail.com>"]
 readme = "README.md"
