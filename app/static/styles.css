@@ -1,25 +1,18 @@
 body {
-    background-color: #fff8de;
+    background-image: url("background.jpg");
+    background-attachment: fixed;
+    background-repeat: repeat-y;
+    background-position: center;
+    background-size: auto;
+    background-color: #fdfef9;
 }
 
 textarea {
     resize: none;
 }
 
-span {
-    font-weight: bold;
-}
-
 .hidden {
     display: none
-}
-
-.h1 {
-    font-weight: bold;
-}
-
-.h4 {
-    font-weight: bold;
 }
 
 .text-wrap {
@@ -34,7 +27,7 @@ span {
     margin-left: 4px;
     width: 13px;
     height: 15px;
-    border: solid 1px #333333;
+    border: solid 1px #e3e3e3;
     border-top: none;
     border-radius: 1px;
     cursor: pointer;
@@ -44,29 +37,27 @@ span {
     left: 2px;
     width: 5px;
     height: 1px;
-    border: solid 1px #333333;
+    border: solid 1px #e3e3e3;
     border-radius: 1px;
 }
 .clipboard.icon:after {
     width: 3px;
     height: 1px;
-    background-color: #333333;
-    box-shadow: 8px 0 0 0 #333333;
+    background-color: #e3e3e3;
+    box-shadow: 8px 0 0 0 #e3e3e3;
 }
 .icon:before, .icon:after {
-content: '';
-position: absolute;
-display: block;
+    content: '';
+    position: absolute;
+    display: block;
+}
+
+.navbar-brand {
+    color: #e3e3e3;
 }
 
 .showNewLine {
     white-space: pre-line;
-}
-
-.custom-tooltip {
-    --bs-tooltip-bg: #faeab4;
-    --bs-tooltip-color: #383838;
-    --bs-tooltip-max-width: 400px;
 }
 
 .safe-width {
@@ -76,9 +67,9 @@ display: block;
 
 .card-info {
     min-width: 750px;
-    width: 70%;
     margin-left: auto;
     margin-right: auto;
+    width: 70%;;
 }
 
 .btn-social {
@@ -86,14 +77,9 @@ display: block;
     padding: .5rem;
 }
 
-.alt-bg {
-    background-color: #fff8de;
-    color: #383838
-}
-
 .bg {
-    background-color: skyblue;
-    color: #141414;
+    background-color: #00314fe3;
+    color: #e3e3e3;
 }
 
 #body-container {
