@@ -101,6 +101,7 @@ def parse_db():
                 "colors": card.get("colors"),
                 "cmc": card.get("cmc"),
                 "mana_cost": card.get("mana_cost"),
+                "type_line": card.get("type_line"),
             }
     del db_json
 
