@@ -8,6 +8,7 @@ class RainbowLands:
     _exotic_orchard = None
     _mana_confluence = None
     _city_of_brass = None
+    _generic_rainbow_land = Land("Rainbow Land", ColorCombinations.FIVE_COLOR, tags=set(), is_generic=True)
 
     @classmethod
     def _get(cls, attr) -> Land:
@@ -42,3 +43,7 @@ class RainbowLands:
     @classmethod
     def city_of_brass(cls) -> Land:
         return cls._get("_city_of_brass")
+    
+    @classmethod
+    def generic_rainbow_land(cls) -> Land:
+        return cls._get("_generic_rainbow_land")

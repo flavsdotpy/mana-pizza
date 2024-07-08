@@ -1,6 +1,13 @@
 from mana_pizza.commons.mtg import ColorCombinations, LandSetMetaclass, LandTags
 
 
+class GenericFetchLands(metaclass=LandSetMetaclass):
+    lands = {
+        "Fetch Land": ColorCombinations.FIVE_COLOR
+    }
+    generic = True
+
+
 class ColoredFetchLands(metaclass=LandSetMetaclass):
     lands = {
         "Flooded Strand": ColorCombinations.AZORIUS,
@@ -22,7 +29,6 @@ class BasicFetchLands(metaclass=LandSetMetaclass):
         "Terramorphic Expanse": ColorCombinations.FIVE_COLOR,
         "Evolving Wilds": ColorCombinations.FIVE_COLOR
     }
-    tags = {}
 
 
 class OtherFechLands(metaclass=LandSetMetaclass):

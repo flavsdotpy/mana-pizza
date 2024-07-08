@@ -4,7 +4,7 @@ from http import HTTPStatus
 from flask import Flask, jsonify, render_template, request
 from flask_wtf.csrf import CSRFProtect
 
-from mana_pizza.smoother import ManaPizzaLandSmoother, ManaSmootherHelper, local_db
+from mana_pizza.smoother import ManaPizzaLandSmoother, ManaSmootherResultType, ManaSmootherHelper, local_db
 
 app = Flask(__name__)
 app.secret_key = os.getenv("CSRF_KEY").encode()
@@ -17,18 +17,36 @@ def index():
     return render_template("index.html", last_update=local_db.get_last_updated())
 
 
-@app.route("/calculate", methods=["POST"])
-def calculate():
+@app.route("/calculate/<result_type>", methods=["POST"])
+def calculate(result_type):
     data = request.get_json()
-    smoother = ManaPizzaLandSmoother(commander=data["commander"], parameters=data["parameters"])
-    lands = smoother.smooth_mana(data["cards"])
-    return jsonify(
-        errors=smoother.errors,
-        cmc_total=smoother.total_cmc,
-        cmc_avg_all=round(smoother.total_cmc / 99, 2),
-        cmc_avg_wo_lands=round(smoother.total_cmc / (99 - len(lands)), 2),
-        pip_count=smoother.pip_count,
-        color_proportions=smoother.color_proportions,
-        total_price=round(sum([l.price for l in lands]), 2),
-        lands=[l.name for l in lands]
-    ), HTTPStatus.OK if not smoother.errors else HTTPStatus.UNPROCESSABLE_ENTITY
+    try:
+        result_type = ManaSmootherResultType(result_type)
+    except:
+        return jsonify(errors=[f"Result type {result_type} not accepted"])
+    smoother = ManaPizzaLandSmoother(commander=data["commander"], parameters=data.get("parameters", dict()))
+    smoother.smooth_mana(data["cards"], result_type)
+    if result_type == ManaSmootherResultType.SIMPLE:
+        return jsonify(
+            errors=smoother.errors,
+            land_count=smoother.land_count,
+            cmc_total=smoother.total_cmc,
+            cmc_avg_all=smoother.cmc_avg_with_lands,
+            cmc_avg_wo_lands=smoother.cmc_avg_wo_lands,
+            pip_count=smoother.pip_count,
+            color_proportions=smoother.color_proportions,
+            selected_lands=smoother.selected_lands_with_count
+        ), HTTPStatus.OK if not smoother.errors else HTTPStatus.UNPROCESSABLE_ENTITY
+    elif result_type == ManaSmootherResultType.ADVANCED:
+        return jsonify(
+            errors=smoother.errors,
+            land_count=smoother.land_count,
+            cmc_total=smoother.total_cmc,
+            cmc_avg_all=smoother.cmc_avg_with_lands,
+            cmc_avg_wo_lands=smoother.cmc_avg_wo_lands,
+            pip_count=smoother.pip_count,
+            color_proportions=smoother.color_proportions,
+            landbase_price=smoother.landbase_price,
+            deck_price=smoother.deck_price,
+            selected_lands=smoother.selected_lands_with_count
+        ), HTTPStatus.OK if not smoother.errors else HTTPStatus.UNPROCESSABLE_ENTITY

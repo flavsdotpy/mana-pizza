@@ -13,13 +13,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
-    <div id="body-container" class="bg">
-        <div class="navbar navbar-expand alt-bg p-1 safe-width">
+    <div id="body-container">
+        <div class="navbar navbar-expand bg p-1 safe-width">
             <span class="navbar-brand mb-0 h1 p-2">Mana Pizza</span>
             <div class="container-fluid justify-content-end">
                 <div>
                     <a class="btn btn-primary btn-floating btn-social" style="background-color: #0082ca" target="_blank" href="https://www.linkedin.com/in/fm-teixeira/" role="button"><i class="fab fa-linkedin-in"></i></a>
-                    <a class="btn btn-primary btn-floating btn-social" style="background-color: #333333" target="_blank" href="https://github.com/ap3xx" role="button"><i class="fab fa-github"></i></a>
+                    <a class="btn btn-primary btn-floating btn-social" style="background-color: #333333" target="_blank" href="https://github.com/flavsdotpy/mana-pizza" role="button"><i class="fab fa-github"></i></a>
                     <a class="btn btn-primary btn-floating btn-social" style="background-color: #7289da" target="_blank" href="https://discordapp.com/users/149312554353688576" role="button"><i class="fab fa-discord"></i></a>
                 </div>
 
@@ -27,27 +27,29 @@
         </div>
         <div id="content-wrapper">
             <div class="container safe-width">
-                <div class="card card-info alt-bg p-3 mt-5" id="descriptionCard">
+                <div class="card card-info bg p-3 mt-5" id="descriptionCard">
                     <h2>What is Mana Pizza?</h1>
                     Mana Pizza is a EDH mana smoother tool. It's meant for EDH players who need advice on which lands choose for their multicolor decks.<br/>
-                    It uses your deck mana color distribution information to decide how lands should be set up and then follows a priority list to choose between multicolor lands.
+                    It uses your deck mana color distribution information to decide how lands should be set up.<br/>
+                    For advanced mode, it actually gives you a complete list of lands based on configured filters.
                 </div>
-                <div class="card card-info alt-bg p-3 mt-5" id="howToCard">
-                    <h2>How to use it?</h1>
+                <div class="card card-info bg p-3 mt-5" id="howToCard">
+                    <h2>How to use it?</h2>
                     <ul>
                         <li>Fill the commander field with your deck's general.</li>
                         <li>Fill the cards list field with all cards of your deck, except lands and the general.</li>
                         <ul>
-                            <li>One card per line.</li>
+                            <li>One card per line. It accepts card count (i.e. '20 Shadowborn Apostle') or repeated cards.</li>
                             <li>English only.</li>
-                            <li>Split cards and/or Double-faced cards must be listed as 'Card1 // Card2' (i.e. 'Dead // Gone').</li>
+                            <li>Split cards and/or Double-faced cards must be listed as 'Card1 // Card2' (i.e. '1 Dead // Gone').</li>
                         </ul>
-                        <li>Set-up filters.</li>
+                        <li>Set-up filters (if applicable).</li>
                         <li>Click generate land base button and see the magic! :)</li>
                     </ul>
+                    <h2>Advanced mode:</h2>
                     <h4>Available filters</h3>
                     <ul>
-                        <li><b>Land price limit</b></li>
+                        <li>Land price limit</li>
                         <ul>
                             <li>Filter out lands that cost more than the value set.</li>
                             <li>Prices based on Scryfall.</li>
@@ -56,93 +58,166 @@
                     </ul>
                 </div>
 
-                <div class="row m-5">
-                    <div class="col-6">
-                        <div class="col-12 mb-3">
-                            <label for="inputCommander" class="form-label h4">Commander</label>
-                            <input id="inputCommander" class="form-control alt-bg"></input>
-                        </div>
-                        <div class="col-12 mb-3">
-                            <label for="inputPriceLimit" class="form-label h4">
-                                Land price limit
-                            </label>
-
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">$</span>
+                <div class="card card-info bg p-3 mt-5" id="mainCard">
+                    
+                    <div id="inputDiv">
+                        <h1 class="text-center mb-3">Inputs</h1>
+                        
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-9 mb-3">
+                                    <label for="inputCommander" class="form-label h4">Commander</label>
+                                    <input id="inputCommander" class="form-control bg"></input>
                                 </div>
-                                <input id="inputPriceLimit" class="form-control alt-bg" type="number" value="10"></input>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">.00</span>
+                                <div class="col-9 mb-3">
+                                    <label for="inputCards" class="form-label h4">
+                                        Cards
+                                    </label>
+                                    <textarea id="inputCards" class="form-control bg" rows="10"></textarea>
                                 </div>
                             </div>
+                            <ul class="nav justify-content-center m-3">
+                                <li class="nav-item"><button class="active btn btn-info" data-bs-toggle="tab" data-bs-target="#simpleTab">Simple</button></li>&nbsp;&nbsp;&nbsp;
+                                <li class="nav-item"><button class="btn btn-danger" data-bs-toggle="tab" data-bs-target="#advancedTab">Advanced</button></li>
+                            </ul>
+                            <div class="tab-content m-5">
+                                <div class="tab-pane active" id="simpleTab">
+                                    <div class="row row-cols-auto justify-content-md-center m-3">
+                                        <button id="calculateSimpleButton" class="btn btn-success ml-3 mr-3">Get land base suggestions</button>&nbsp;&nbsp;&nbsp;
+                                        <button id="clearSimpleInputsButton" class="btn btn-warning">Clear inputs</button>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="advancedTab">
+                                    <div class="row justify-content-center">
+                                        <div class="col-4 mb-3">
+                                            <label for="inputPriceLimit" class="form-label h4">
+                                                Land price limit
+                                            </label>
+            
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon1">$</span>
+                                                </div>
+                                                <input id="inputPriceLimit" class="form-control bg" type="number" value="10"></input>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">.00</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row row-cols-auto justify-content-md-center m-3 mb-5">
+                                        <button id="calculateAdvancedButton" class="btn btn-success ml-3 mr-3">Generate complete land base</button>&nbsp;&nbsp;&nbsp;
+                                        <button id="clearAdvancedInputsButton" class="btn btn-warning">Clear inputs</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-6">
-                        <label for="inputCards" class="form-label h4">
-                            Cards
-                        </label>
-                        <textarea id="inputCards" class="form-control alt-bg" rows="20"></textarea>
+                    <div id="outputSimpleDiv" class="hidden">
+                        <h1 class="text-center mb-3">Results</h1>
+                        <div class="row justify-content-center">
+                            <div class="col-5 mb-3">
+                                <span class="h4">Lands Suggestion</span>
+                                <div class="col-12 mt-2">
+                                    <span id="outputSimpleLands" class="showNewLine"></span>
+                                </div>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <span class="h4">Deck Stats</span>
+                                <br/>
+                                <div class="col-12 mt-2">
+                                    <span>Land Count: </span><span id="statsSimpleLandCount"></span>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <span>Total CMC: </span><span id="statsSimpleTotalCMC"></span>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <span>Avg. CMC w/ Lands: </span><span id="statsSimpleAvgCMC"></span>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <span>Avg. CMC w/o Lands: </span><span id="statsSimpleAvgCMCNoLands"></span>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <span>Color Distribution: </span><br/>
+                                    &#9;&#9;<span id="statsSimplePercentW" class="showNewLine"></span>
+                                    &#9;&#9;<span id="statsSimplePercentU" class="showNewLine"></span>
+                                    &#9;&#9;<span id="statsSimplePercentB" class="showNewLine"></span>
+                                    &#9;&#9;<span id="statsSimplePercentR" class="showNewLine"></span>
+                                    &#9;&#9;<span id="statsSimplePercentG" class="showNewLine"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row row-cols-auto justify-content-md-center m-3">
+                            <button id="closeSimpleOutputDiv" class="btn btn-light">Close results</button>
+                        </div>
+                    </div>
+
+                    <div id="outputAdvancedDiv" class="hidden">
+                        <h1 class="text-center mb-3">Results</h1>
+                        <div class="row justify-content-center">
+                            <div class="col-5 mb-3">
+                                <div class="text-wrap">
+                                    <label for="outputAdvancedLands" class="form-label h4">Selected Lands</label>
+                                    <textarea id="outputAdvancedLands" class="form-control bg"  rows="10" readonly></textarea>
+                                    <div id="copyResult" class="clipboard icon"></div>
+                                </div>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <span class="h4">Stats</span>
+                                <br/>
+                                <div class="col-12 mt-2">
+                                    <span>Land Count: </span><span id="statsAdvancedLandCount"></span>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <span>Total CMC: </span><span id="statsAdvancedTotalCMC"></span>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <span>Avg. CMC w/ Lands: </span><span id="statsAdvancedAvgCMC"></span>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <span>Avg. CMC w/o Lands: </span><span id="statsAdvancedAvgCMCNoLands"></span>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <span>Color Distribution: </span><br/>
+                                    &#9;&#9;<span id="statsAdvancedPercentW" class="showNewLine"></span>
+                                    &#9;&#9;<span id="statsAdvancedPercentU" class="showNewLine"></span>
+                                    &#9;&#9;<span id="statsAdvancedPercentB" class="showNewLine"></span>
+                                    &#9;&#9;<span id="statsAdvancedPercentR" class="showNewLine"></span>
+                                    &#9;&#9;<span id="statsAdvancedPercentG" class="showNewLine"></span>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <span>Total land base price: $</span><span id="statsAdvancedLandbasePrice"></span>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <span>Total deck price: $</span><span id="statsAdvancedDeckPrice"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row row-cols-auto justify-content-md-center m-3">
+                            <button id="closeAdvancedOutputDiv" class="btn btn-light">Close results</button>
+                        </div>
+                    </div>
+
+                    <div id="errorsDiv" class="hidden">
+                        <div class="row">
+                            <h1 class="text-center mb-3">Error</h1>
+                            <div class="col-12 mb-3">
+                                <span id="spanErrors" class="showNewLine"></span>
+                            </div>
+                        </div>
+                        <div class="row row-cols-auto justify-content-md-center m-3">
+                            <button id="closeErrorsDiv" class="btn btn-light">Close results</button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row row-cols-auto justify-content-md-center m-5">
-                    <button id="calculateButton" class="btn btn-success ml-3 mr-3">Generate land base</button>&nbsp;&nbsp;&nbsp;
-                    <button id="clearButton" class="btn btn-warning">Clear</button>
-                </div>
+                    
             </div>
-            <div class="container safe-width hidden" id="outputDiv">
-                <div class="row m-5">
-                    <div class="col-6 mb-3">
-                        <span class="h4">Stats</span>
-                        <div class="card alt-bg p-3 mt-2">
-                            <div class="col-12 mb-2">
-                                <span>Total CMC: </span><span id="spanTotalCMC"></span>
-                            </div>
-                            <div class="col-12 mb-2">
-                                <span>Avg. CMC w/ Lands: </span><span id="spanAvgCMC"></span>
-                            </div>
-                            <div class="col-12 mb-2">
-                                <span>Avg. CMC w/o Lands: </span><span id="spanAvgCMCNoLands"></span>
-                            </div>
-                            <div class="col-12 mb-2">
-                                <span>Color Distribution: </span><br/>
-                                &#9;&#9;<span id="spanPercentW" class="showNewLine"></span>
-                                &#9;&#9;<span id="spanPercentU" class="showNewLine"></span>
-                                &#9;&#9;<span id="spanPercentB" class="showNewLine"></span>
-                                &#9;&#9;<span id="spanPercentR" class="showNewLine"></span>
-                                &#9;&#9;<span id="spanPercentG" class="showNewLine"></span>
-                            </div>
-                            <div class="col-12">
-                                <span>Total land base price: $</span><span id="spanPrice"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <div class="text-wrap">
-                            <label for="outputLands" class="form-label h4">Selected Lands</label>
-                            <textarea id="outputLands" class="form-control alt-bg"  rows="20" readonly></textarea>
-                            <div id="copyResult" class="clipboard icon"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="container safe-width hidden" id="errorsDiv">
-                <div class="row card alt-bg m-5 p-3">
-                    <h2 class="p-2 text-center">Error</h1>
-                    <div class="col-12 mb-3">
-                        <span id="spanErrors" class="showNewLine"></span>
-                    </div>
-                </div>
-            </div>
+
         </div>
-        <footer id="footer" class="safe-width alt-bg">
-            <div class="text-center">
-                Made by Flávio Teixeira
-            </div>
-        </footer>
 
+            
     </div>
 
     <!-- Bootstrap JS and AJAX Script -->
