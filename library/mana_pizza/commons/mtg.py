@@ -11,17 +11,33 @@ class ManaColors:
     GREEN = "G"
 
 
-class Land:
+class Card:
 
-    def __init__(self, name: str, colors: tuple, tags: set):
+    def __init__(self, name: str, is_generic: bool = False):
         self.name = name
-        self.colors = colors
-        self.tags = tags
+        self.is_generic = is_generic
         self._load_scryfall_info()
 
     def _load_scryfall_info(self):
-        card = local_db.get_card_by_name(self.name)
-        self.price = card["price"] or inf
+        if not self.is_generic:
+            card = local_db.get_card_by_name(self.name)
+            self.price = card["price"] or inf
+            self.cmc = card["cmc"]
+            self.mana_cost = card["mana_cost"]
+            self.type_line = card["type_line"]
+        else:
+            self.price = 0.0
+            self.cmc = 0
+            self.mana_cost = ""
+            self.type_line = ""
+
+
+class Land(Card):
+
+    def __init__(self, name: str, colors: tuple, tags: set, is_generic: bool = True):
+        super().__init__(name, is_generic)
+        self.colors = colors
+        self.tags = tags
 
     def can_be_fetched(self) -> bool:
         return LandTags.FETCHABLE in self.tags
@@ -49,6 +65,9 @@ class Land:
 
     def does_scry(self) -> bool:
         return LandTags.SCRY in self.tags
+    
+    def does_surveil(self) -> bool:
+        return LandTags.SURVEIL in self.tags
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -77,10 +96,7 @@ class LandTags:
     LIFEGAIN = "lifegain"
     SCRY = "scry"
     MANA_SINK = "mana_sink_ability"
-
-
-class Editions:
-    THIRD_EDITION = "3ed"
+    SURVEIL = "surveil"
 
 
 class ColorCombinations:
@@ -132,7 +148,7 @@ class LandSetMetaclass(type):
         return next(iter([l for l in all if set(combination).issubset(set(l.colors))]), None)
 
     def _load_lands(cls):
-        _REQUIRED_ATTRS = {"lands", "tags"}
+        _REQUIRED_ATTRS = {"lands"}
         for attr in _REQUIRED_ATTRS:
             if not hasattr(cls, attr):
                 raise Exception(f"Please define `{attr}` class atribute")
@@ -140,5 +156,6 @@ class LandSetMetaclass(type):
             cls._lands.append(Land(
                 name=land,
                 colors=colors,
-                tags=getattr(cls, "tags")
+                tags=getattr(cls, "tags", set()),
+                is_generic=getattr(cls, "generic", False)
             ))

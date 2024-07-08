@@ -1,6 +1,22 @@
 from mana_pizza.commons.mtg import ColorCombinations, LandSetMetaclass, LandTags
 
 
+class GenericTripleLands(metaclass=LandSetMetaclass):
+    lands = {
+        "Mardu Tri-land": ColorCombinations.MARDU,
+        "Abzan Tri-land": ColorCombinations.ABZAN,
+        "Sultai Tri-land": ColorCombinations.SULTAI,
+        "Temur Tri-land": ColorCombinations.TEMUR,
+        "Jeskai Tri-land": ColorCombinations.JESKAI,
+        "Bant Tri-land": ColorCombinations.BANT,
+        "Esper Tri-land": ColorCombinations.ESPER,
+        "Grixis Tri-land": ColorCombinations.GRIXIS,
+        "Jund Tri-land": ColorCombinations.JUND,
+        "Naya Tri-land": ColorCombinations.NAYA,
+    }
+    generic = True
+
+
 class TripleLands(metaclass=LandSetMetaclass):
     lands = {
         "Seaside Citadel": ColorCombinations.BANT,
@@ -14,7 +30,6 @@ class TripleLands(metaclass=LandSetMetaclass):
         "Frontier Bivouac": ColorCombinations.TEMUR,
         "Mystic Monastery": ColorCombinations.JESKAI,
     }
-    tags = {}
 
 
 class Triomes(metaclass=LandSetMetaclass):

@@ -1,4 +1,20 @@
-from mana_pizza.commons.mtg import ColorCombinations, Editions, LandSetMetaclass, LandTags
+from mana_pizza.commons.mtg import ColorCombinations, LandSetMetaclass, LandTags
+
+
+class GenericDualLand(metaclass=LandSetMetaclass):
+    lands = {
+        "Azorius Dual-land": ColorCombinations.AZORIUS,
+        "Boros Dual-land": ColorCombinations.BOROS,
+        "Dimir Dual-land": ColorCombinations.DIMIR,
+        "Golgari Dual-land": ColorCombinations.GOLGARI,
+        "Gruul Dual-land": ColorCombinations.GRUUL,
+        "Izzet Dual-land": ColorCombinations.IZZET,
+        "Orzhov Dual-land": ColorCombinations.ORZHOV,
+        "Rakdos Dual-land": ColorCombinations.RAKDOS,
+        "Selesnya Dual-land": ColorCombinations.SELESNYA,
+        "Simic Dual-land": ColorCombinations.SIMIC,
+    }
+    generic = True
 
 
 class BicycleLands(metaclass=LandSetMetaclass):
@@ -222,6 +238,22 @@ class SlowLands(metaclass=LandSetMetaclass):
     tags = {LandTags.ENTERS_UNTAPPED}
 
 
+class SurveilLands(metaclass=LandSetMetaclass):
+    lands = {
+        "Underground Mortuary": ColorCombinations.GOLGARI,
+        "Raucous Theater": ColorCombinations.RAKDOS,
+        "Undercity Sewers": ColorCombinations.DIMIR,
+        "Shadowy Backstreet": ColorCombinations.ORZHOV,
+        "Commercial District": ColorCombinations.GRUUL,
+        "Hedge Maze": ColorCombinations.SIMIC,
+        "Lush Portico": ColorCombinations.SELESNYA,
+        "Thundering Falls": ColorCombinations.IZZET,
+        "Elegant Parlor": ColorCombinations.BOROS,
+        "Meticulous Archive": ColorCombinations.AZORIUS,
+    }
+    tags = {LandTags.SURVEIL, LandTags.FETCHABLE}
+
+
 class FastLands(metaclass=LandSetMetaclass):
     lands = {
         "Seachrome Coast": ColorCombinations.AZORIUS,
@@ -402,7 +434,6 @@ class OldPureTapLands(metaclass=LandSetMetaclass):
         "Shivan Oasis": ColorCombinations.GRUUL,
         "Elfhame Palace": ColorCombinations.SELESNYA,
     }
-    tags = {}
 
 
 class PureTapLands(metaclass=LandSetMetaclass):
@@ -418,24 +449,24 @@ class PureTapLands(metaclass=LandSetMetaclass):
         "Stone Quarry": ColorCombinations.BOROS,
         "Woodland Stream": ColorCombinations.SIMIC,
     }
-    tags = {}
 
 
 PICK_PRIORITY = {
     0: OGDuals,
-    1: ShockLands,
-    2: CheckLands,
-    3: TangoLands,
-    4: BoundLands,
-    5: SlowLands,
-    6: FilterLands,
-    7: Pathways,
-    8: BicycleLands,
-    9: HorizonLands,
-    10: PainLands,
-    11: RevealLands,
-    12: OldFilterLands,
-    13: FastLands,
+    1: SurveilLands,
+    2: ShockLands,
+    3: CheckLands,
+    4: TangoLands,
+    5: BoundLands,
+    6: SlowLands,
+    7: FilterLands,
+    8: Pathways,
+    9: BicycleLands,
+    10: HorizonLands,
+    11: PainLands,
+    12: RevealLands,
+    13: OldFilterLands,
+    14: FastLands,
     15: Temples,
     16: Campuses,
     17: CapennaLocales,
