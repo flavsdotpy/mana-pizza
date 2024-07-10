@@ -107,7 +107,8 @@ class ManaPizzaLandSmoother:
             card = local_db.get_card_by_name(self.commander)
             self.deck_color_identity = set(card["color_identity"])
         except:
-            self.errors.append("Commander not found!")
+            self.errors.append(f"Commander {self.commander} not found!")
+            self.deck_color_identity = None
 
     def __reset(self):
         self.selected_lands = list()
@@ -371,7 +372,7 @@ class ManaPizzaLandSmoother:
     def smooth_mana(self, deck_list: list[str], result_type: ManaSmootherResultType):
         self.__reset()
 
-        if not self.deck_color_identity:
+        if self.deck_color_identity is None:
             return
 
         if len(self.deck_color_identity) < 2:
