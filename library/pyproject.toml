@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mana-pizza"
-version = "1.1.0"
+version = "1.1.1"
 description = "Mana-smoothing algorythm library meant for 2+ colors EDH decks."
 authors = ["Flavio Teixeira <flavio.mtps@gmail.com>"]
 readme = "README.md"

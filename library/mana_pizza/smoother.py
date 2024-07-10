@@ -104,7 +104,7 @@ class ManaPizzaLandSmoother:
     def __load_commander_info(self):
         get_logger().debug(f"Loading info. Commander: {self.commander}")
         try:
-            card = local_db.get_card_by_name(self.commander)
+            card = local_db.get_card_by_name(self.commander.strip())
             self.deck_color_identity = set(card["color_identity"])
         except:
             self.errors.append(f"Commander {self.commander} not found!")
@@ -116,6 +116,7 @@ class ManaPizzaLandSmoother:
         self.deck_cards = defaultdict(dict)
         self.pip_count = {}
         self.total_cmc = 0
+        self.land_count = 0
         self.total_pips = 0
         self.color_proportions = dict()
         self.cmc_avg_wo_lands = 0.0
@@ -173,7 +174,7 @@ class ManaPizzaLandSmoother:
         get_logger().debug(f"Pip count:")
         for c, count in self.pip_count.items():
             get_logger().debug(f"{c}: {count}")
-    
+
     def __calc_price_stats(self):
         self.landbase_price = round(sum([l.price for l in self.selected_lands]), 2)
         self.deck_price = round(sum([c["price"] * c["count"] for c in self.deck_cards.values()]) + self.landbase_price, 2)
@@ -252,7 +253,7 @@ class ManaPizzaLandSmoother:
         color_proportions = self.color_proportions.copy()
         dual_land_pairs = self.__calc_dual_land_pairs(color_proportions, num_dual_lands)
         pairs_count = dict(Counter([tuple(pair) for pair in dual_land_pairs]))
-        
+
         if result_type == ManaSmootherResultType.ADVANCED:
             for dual_land_class in DUAL_PICK_PRIORITY.values():
                 for color_pair in pairs_count:
@@ -268,7 +269,7 @@ class ManaPizzaLandSmoother:
                 while pairs_count[color_pair]:
                     self.__select_land(GenericDualLand.get_for_combination(color_pair))
                     pairs_count[color_pair] -= 1
-            
+
 
         get_logger().debug(f"Selected {len(self.selected_lands) - before} dual lands!")
 
@@ -294,7 +295,7 @@ class ManaPizzaLandSmoother:
                 (colors[0], colors[1], colors[3]),
                 (colors[0], colors[1], colors[4])
             ]
-            
+
         if result_type == ManaSmootherResultType.ADVANCED:
             for tri_land_class in TRI_PICK_PRIORITY.values():
                 for color_trio in trio_color_combinations:
@@ -383,10 +384,14 @@ class ManaPizzaLandSmoother:
             if not card:
                 continue
 
-            card_regex_pattern = r"^(?P<count>[0-9]{1,2})?(?: )?(?P<card_name>.*)$"
-            match = re.match(card_regex_pattern, card)
-            count = int(match.groupdict().get("count", 1))
-            card_name = match.group("card_name")
+            try:
+                card_regex_pattern = r"^(?P<count>[0-9]{1,2}x?\s?)?(?P<card_name>.*)$"
+                match = re.match(card_regex_pattern, card)
+                count = int(match.groupdict().get("count", "1").replace("x", "").strip())
+                card_name = match.group("card_name").strip()
+            except:
+                self.errors.append(f"Something is not right with card entry: {card}")
+
             try:
                 card_obj = Card(card_name)
             except:
@@ -405,7 +410,7 @@ class ManaPizzaLandSmoother:
         if self.land_count < 25:
             self.errors.append(f"{self.land_count} is too little land slots! Please leave more room!")
             return
-    
+
         self.__calc_mana_stats()
 
         if self.errors:
