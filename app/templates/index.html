@@ -11,6 +11,12 @@
     <link href="./static/styles.css" rel="stylesheet">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <meta name="og-title" property="og:title" content="Mana Pizza - EDH mana smoothing tool"/>
+    <meta type="og-type" property="og:type" content="website" />
+    <meta name="og-description" property="og:description" content="Mana Pizza is a EDH mana smoother tool. It's meant for EDH players who need advice on which lands choose for their multicolor decks" />
+    <meta name="og-image" property="og:image" content="https://i.imgur.com/9seVyaE.jpg" />
+    <meta name="og-url" property="og:url" content="https://mana-pizza.flavsdotpy.com/" />
 </head>
 <body>
     <div id="body-container">
@@ -59,10 +65,10 @@
                 </div>
 
                 <div class="card card-info bg p-3 mt-5" id="mainCard">
-                    
+
                     <div id="inputDiv">
                         <h1 class="text-center mb-3">Inputs</h1>
-                        
+
                         <div class="container">
                             <div class="row justify-content-center">
                                 <div class="col-9 mb-3">
@@ -93,7 +99,7 @@
                                             <label for="inputPriceLimit" class="form-label h4">
                                                 Land price limit
                                             </label>
-            
+
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
                                                 <span class="input-group-text" id="basic-addon1">$</span>
@@ -212,12 +218,12 @@
                     </div>
                 </div>
 
-                    
+
             </div>
 
         </div>
 
-            
+
     </div>
 
     <!-- Bootstrap JS and AJAX Script -->
