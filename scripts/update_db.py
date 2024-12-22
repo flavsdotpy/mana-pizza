@@ -94,8 +94,13 @@ def parse_db():
 
             card_name = card.get("flavor_name", card["name"])
 
+            lowest_price = inf
+            for cur, value in card.get("prices", dict()).items():
+                if cur.startswith("usd") and value and float(value) < lowest_price:
+                    lowest_price = float(value)
+
             db_full[card_name.upper()][f'{card["set"]}#{card["collector_number"]}'] = {
-                "price": float(card.get("prices", dict()).get("usd", inf) or inf),
+                "price": lowest_price if lowest_price != inf else 1000.0,
                 "name": card_name,
                 "color_identity": card.get("color_identity"),
                 "colors": card.get("colors"),
