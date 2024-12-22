@@ -1,7 +1,7 @@
 import re
 from collections import Counter, defaultdict
 from enum import Enum
-from math import ceil, inf
+from math import ceil, floor, inf
 
 from mana_pizza.commons.db import local_db
 from mana_pizza.commons.log import get_logger
@@ -12,6 +12,7 @@ from mana_pizza.lands.dual import PICK_PRIORITY as DUAL_PICK_PRIORITY, GenericDu
 from mana_pizza.lands.fetch import PICK_PRIORITY as FETCH_PICK_PRIORITY, ColoredFetchLands, GenericFetchLands
 from mana_pizza.lands.rainbow import RainbowLands
 from mana_pizza.lands.tri import PICK_PRIORITY as TRI_PICK_PRIORITY, GenericTripleLands
+from mana_pizza.validator import ManaPizzaValidator
 
 
 
@@ -159,6 +160,8 @@ class ManaPizzaLandSmoother:
                 k: self.pip_count.get(k, 0) + card_pips.get(k, 0)
                 for k in set(self.pip_count) | set(card_pips)
             }
+            ManaPizzaValidator.validate_color_identity(self.errors, self.deck_color_identity, card_pips, card_name)
+
         self.total_pips = sum(self.pip_count.values())
         self.color_proportions = dict(sorted(
             {
@@ -203,54 +206,95 @@ class ManaPizzaLandSmoother:
                     self.__select_land(basic_land)
         get_logger().debug(f"Selected {len(self.selected_lands) - before} basic lands!")
 
-    def __calc_dual_land_pairs(
-        self, color_proportions: dict, num_lands: int, pairs: list[set] = None, has_major_color: bool = False
-    ) -> list[list]:
-        pairs = [set() for _ in range(num_lands)] if not pairs else pairs
-
-        num_colors = 2 * num_lands
-        color_proportions = dict(sorted(color_proportions.items(), key=lambda item: item[1], reverse=True))
-        sum_proportions = sum(color_proportions.values())
-
+    def __calc_dual_land_pairs(self, color_proportions: dict, num_lands: int) -> list[list]:
         if len(self.deck_color_identity) == 2:
             return [tuple(self.deck_color_identity) for _ in range(num_lands)]
-        if not(sum_proportions):
-            return pairs
 
-        cur_color = list(color_proportions.keys())[0]
-        cur_color_proportion = color_proportions.pop(cur_color)
-        cur_color_lands = ceil(cur_color_proportion / sum_proportions * num_lands) \
-                        if has_major_color \
-                        else ceil(cur_color_proportion * num_colors)
+        pairs = [set() for _ in range(num_lands)]
 
-        count = 0
-        if any(not pair for pair in pairs):
-            for pair in pairs:
-                if len(pair) < 1:
-                    pair.add(cur_color)
-                    count += 1
-                if count >= cur_color_lands:
+        color_proportions = dict(sorted(color_proportions.items(), key=lambda item: item[1], reverse=True))
+        most_present_colors_pair = list(color_proportions.keys())[:2]
+
+        colors_calculated = set()
+        while len(colors_calculated) < len(self.deck_color_identity):
+            color_proportions = dict(sorted(color_proportions.items(), key=lambda item: item[1], reverse=True))
+
+            for color in color_proportions.keys():
+                if color not in colors_calculated:
+                    cur_color = color
                     break
+            cur_color_proportion = color_proportions.pop(cur_color)
+
+            if cur_color_proportion >= .5:
+                for pair in pairs:
+                    pair.add(cur_color)
+                colors_calculated.add(cur_color)
+
+                sum_proportions = sum(color_proportions.values())
+                for cur_pair, cur_pair_proportion in color_proportions.items():
+                    lands_to_add = ceil(cur_pair_proportion / sum_proportions * num_lands)
+                    
+                    count, added = 0, True
+                    while count < lands_to_add and added:
+                        added = False
+                        for pair in pairs:
+                            if len(pair) < 2:
+                                pair.add(cur_pair)
+                                count += 1
+                                added = True
+                                break
+                    colors_calculated.add(cur_pair)
+            else:
+                cur_color_pairs = ceil(cur_color_proportion * num_lands)
+                count, added = 0, True
+                while count < cur_color_pairs and added:
+                    added = False
+                    for pair in pairs:
+                        if len(pair) < 1:
+                            pair.add(cur_color)
+                            count += 1
+                            added = True
+                            break
+                sum_proportions = sum(color_proportions.values())
+                pairs_count = {
+                    c: floor(p / sum_proportions * cur_color_pairs) or 1
+                    for c, p in color_proportions.items()
+                }
+                for pair_color, num_pairs in pairs_count.items():
+                    count, added = 0, True
+                    while count < num_pairs and added:
+                        added = False
+                        for pair in pairs:
+                            if len(pair) == 1 and cur_color in pair:
+                                pair.add(pair_color)
+                                count += 1
+                                added = True
+                                break
+                colors_calculated.add(cur_color)
+
+            color_proportions[cur_color] = cur_color_proportion
+        
         for pair in pairs:
-            if len(pair) < 2 and cur_color not in pair:
-                pair.add(cur_color)
-                count += 1
-            if count >= cur_color_lands:
-                break
+            if len(pair) < 2:
+                if most_present_colors_pair[0] in pair:
+                    pair.add(most_present_colors_pair[1])
+                if most_present_colors_pair[1] in pair:
+                    pair.add(most_present_colors_pair[0])
+            elif len(pair) < 1:
+                pair.add(most_present_colors_pair[0])
+                pair.add(most_present_colors_pair[1])
 
-        if not color_proportions:
-            return pairs
-
-        if not has_major_color and cur_color_proportion >= .5:
-            has_major_color = True
-
-        return self.__calc_dual_land_pairs(color_proportions, num_lands, pairs, has_major_color)
+        return pairs
 
     def __get_dual_lands(self, result_type: ManaSmootherResultType):
         get_logger().debug("Selecting dual lands...")
         before = len(self.selected_lands)
         num_dual_lands = self.land_count - len(self.selected_lands)
         color_proportions = self.color_proportions.copy()
+        for color_pip in list(color_proportions.keys()):
+            if color_pip not in self.deck_color_identity:
+                color_proportions.pop(color_pip)
+
         dual_land_pairs = self.__calc_dual_land_pairs(color_proportions, num_dual_lands)
         pairs_count = dict(Counter([tuple(pair) for pair in dual_land_pairs]))
 
@@ -387,7 +431,7 @@ class ManaPizzaLandSmoother:
             try:
                 card_regex_pattern = r"^(?P<count>[0-9]{1,2}x?\s?)?(?P<card_name>.*)$"
                 match = re.match(card_regex_pattern, card)
-                count = int(match.groupdict().get("count", "1").replace("x", "").strip())
+                count = int((match.groupdict().get("count") or "1").replace("x", "").strip())
                 card_name = match.group("card_name").strip()
             except:
                 self.errors.append(f"Something is not right with card entry: {card}")

@@ -29,8 +29,10 @@ def calculate(result_type):
         smoother = ManaPizzaLandSmoother(commander=data["commander"], parameters=data.get("parameters", dict()))
         smoother.smooth_mana(data["cards"], result_type)
     except Exception as e:
-        return jsonify(errors=["Something is not right at the server side!"
-                               f"Please message the admin and show him this message: {str(e)}"])
+        return jsonify(
+            errors=["Something is not right at the server side! \n"
+                    f"Please message the admin and show him this message: \n\n{str(e)}"],
+        ), HTTPStatus.UNPROCESSABLE_ENTITY
 
     if result_type == ManaSmootherResultType.SIMPLE:
         return jsonify(
