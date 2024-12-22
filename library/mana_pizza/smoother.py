@@ -160,8 +160,7 @@ class ManaPizzaLandSmoother:
                 k: self.pip_count.get(k, 0) + card_pips.get(k, 0)
                 for k in set(self.pip_count) | set(card_pips)
             }
-
-        ManaPizzaValidator.validate_color_identity(self.deck_color_identity, self.pip_count)
+            ManaPizzaValidator.validate_color_identity(self.errors, self.deck_color_identity, card_pips, card_name)
 
         self.total_pips = sum(self.pip_count.values())
         self.color_proportions = dict(sorted(
