@@ -17,7 +17,11 @@ class ScryfallClient:
 
     def __request_scryfall_api(self, endpoint, body=None, params=None):
         sleep(.1)
-        res = requests.get(f"{self.__SCRYFALL_API_HOST}/{endpoint}", json=body or {}, params=params or {})
+        headers = {
+            "User-Agent": "ManaPizza/1.1.1",
+            "From": "flavio.mtps@gmail.com",
+        }
+        res = requests.get(f"{self.__SCRYFALL_API_HOST}/{endpoint}", json=body or {}, params=params or {}, headers=headers)
         if res.status_code > 299:
             get_logger().error(f"Something happened when requesting scryfall API: {res.content}")
             get_logger().error(f"Endpoint: {endpoint}. Status code: {res.status_code}")
